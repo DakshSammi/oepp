@@ -1,21 +1,20 @@
 package edu.stanford.bmir.protege.examples.oquareMetrics;
 
+import java.util.Set;
+
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-
 import edu.stanford.bmir.protege.examples.view.MetricCalculator;
-import java.util.Set;
 
+public class RROntoCalculator implements MetricCalculator {
 
-public class WMCOntoCalculator implements MetricCalculator {
     @Override
     public double calculate(OWLOntology ontology) {
 
-        double WMCOnto = 0;
-
+        double RROnto = 0;
         Set<OWLClass> classes = ontology.getClassesInSignature();
 
         int subClassofAxiomCount = ontology.getAxiomCount(AxiomType.SUBCLASS_OF);
@@ -36,8 +35,8 @@ public class WMCOntoCalculator implements MetricCalculator {
         }
     }
 
-        WMCOnto = (double) (dataPropAssertionAxiomCount + objectPropOnClasses + subClassofAxiomCount) / classes.size();
+        RROnto = (double) (dataPropAssertionAxiomCount + objectPropOnClasses) / (dataPropAssertionAxiomCount + objectPropOnClasses + subClassofAxiomCount);
 
-        return WMCOnto;
+        return RROnto;
     }
 }

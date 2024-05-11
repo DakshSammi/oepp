@@ -8,23 +8,22 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
+import java.awt.Desktop;
+import java.net.URI;
 
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-// import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -37,14 +36,17 @@ import edu.stanford.bmir.protege.examples.oquareMetrics.CBOntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.CROntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.DITOntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.INROntoCalculator;
-import edu.stanford.bmir.protege.examples.oquareMetrics.WMCOntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.LCOMOntoCalculator;
+import edu.stanford.bmir.protege.examples.oquareMetrics.WMCOntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.NACOntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.NOCOntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.NOMOntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.POntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.PROntoCalculator;
 import edu.stanford.bmir.protege.examples.oquareMetrics.RFCOntoCalculator;
+import edu.stanford.bmir.protege.examples.oquareMetrics.RROntoCalculator;
+import edu.stanford.bmir.protege.examples.oquareMetrics.TMOntoCalculator;
+// import edu.stanford.bmir.protege.examples.oquareMetrics.Modularity;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -55,7 +57,7 @@ public class Metrics extends JPanel {
     private JTable metricsTable;
     private DefaultTableModel tableModel;
     private JButton refreshButton = new JButton("Refresh");
-    private JButton helpButton = new JButton("Help"); // Create the Help button
+    private JButton helpButton = new JButton("Help"); // Create the help button
     private JLabel titleLabel = new JLabel("OEPP - Metrics Dashboard", SwingConstants.CENTER);
 
     private OWLModelManager modelManager;
@@ -72,7 +74,7 @@ public class Metrics extends JPanel {
 
      public Metrics(OWLModelManager modelManager){
         this.modelManager = modelManager;
-        this.metricCalculators = Arrays.asList(new WMCOntoCalculator(), new ANOntoCalculator(), new AROntoCalculator(), new CBOntoCalculator(), new CROntoCalculator(), new DITOntoCalculator(), new INROntoCalculator(), new LCOMOntoCalculator(), new NACOntoCalculator(), new NOCOntoCalculator(), new NOMOntoCalculator(), new POntoCalculator(), new PROntoCalculator(), new RFCOntoCalculator());
+        this.metricCalculators = Arrays.asList(new WMCOntoCalculator(), new ANOntoCalculator(), new AROntoCalculator(), new CBOntoCalculator(), new CROntoCalculator(), new DITOntoCalculator(), new INROntoCalculator(), new LCOMOntoCalculator(), new NACOntoCalculator(), new NOCOntoCalculator(), new NOMOntoCalculator(), new POntoCalculator(), new PROntoCalculator(), new RFCOntoCalculator(), new RROntoCalculator(), new TMOntoCalculator());
 
         setupTitle();
         setupTable();
@@ -112,62 +114,13 @@ public class Metrics extends JPanel {
     }
 
     private void showHelpDialog() {
-        JDialog helpDialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Help");
-        JTextPane helpTextPane = new JTextPane();
-        helpTextPane.setContentType("text/html");
-        helpTextPane.setEditable(false);
-
-        String htmlContent = "<html><body>"
-                + "<h2>Metrics Dashboard Help</h2>"
-                + "<p>This help section provides detailed information about the OQuaRE metrics used to evaluate the quality of ontologies. Each metric is calculated based on specific ontology elements and contributes to a comprehensive understanding of the ontology's characteristics.</p>"
-                + "<h3>Ontology Quality Metrics</h3>"
-                + "<ul>"
-                + "<li><strong>Lack of Cohesion in Methods (LCOMOnto):</strong> Measures the semantic and conceptual relatedness of classes in an ontology. A lower score indicates better cohesion.</li>"
-                + "<li><strong>Weighted Method Count (WMCOnto):</strong> Calculates the mean number of properties and relationships per class. Higher values may indicate greater complexity.</li>"
-                + "<li><strong>Depth of Subsumption Hierarchy (DITOnto):</strong> Measures the length of the longest path from the root class to a leaf class. Deeper hierarchies may be more complex.</li>"
-                + "<li><strong>Number of Ancestor Classes (NACOnto):</strong> Calculates the mean number of ancestor classes per leaf class. Reflects the inheritance hierarchy.</li>"
-                + "<li><strong>Number of Children (NOCOnto):</strong> Measures the mean number of direct subclasses per class. Indicates the breadth of the ontology hierarchy.</li>"
-                + "<li><strong>Coupling Between Objects (CBOOnto):</strong> Quantifies the number of related classes. Lower coupling is often desirable for maintainability.</li>"
-                + "<li><strong>Response for a Class (RFCOnto):</strong> Measures the number of properties directly accessible from each class. Reflects class complexity.</li>"
-                + "<li><strong>Number of Properties (NOMOnto):</strong> Calculates the average number of properties per class. Provides insights into property richness.</li>"
-                + "<li><strong>Properties Richness (PROnto):</strong> Evaluates the number of properties defined relative to the total number of relationships and properties.</li>"
-                + "<li><strong>Relationship Richness (RROnto):</strong> The number of usages of object and data properties divided by the number of subclass relationships and properties.</li>"
-                + "<li><strong>Attribute Richness (AROnto):</strong> Measures the mean number of attributes per class. Reflects attribute complexity and richness.</li>"
-                + "<li><strong>Relationships per Class (INROnto):</strong> Calculates the mean number of relationships per class. Indicates relationship complexity.</li>"
-                + "<li><strong>Class Richness (CROnto):</strong> Evaluates the mean number of instances per class. Reflects instance diversity and abundance.</li>"
-                + "<li><strong>Ancestors per Class (POnto):</strong> Evaluates the number of ancestors per class by dividing the number of superclasses per each class.</li>"
-                + "<li><strong>Annotation Richness (ANOnto):</strong> Measures the mean number of annotations per class. Reflects the extent of metadata associated with classes.</li>"
-                + "<li><strong>Tangledness (TMOnto):</strong> Evaluates the mean number of parents per class, considering multiple inheritance. Reflects class hierarchy complexity.</li>"
-                + "</ul>"
-                + "<h3>Interpreting Scores</h3>"
-                + "<p>Scores for each metric can be interpreted as follows:</p>"
-                + "<ul>"
-                // Include an image showing best to worst score for each metric
-                + "</ul>"
-                + "<h3>Calculating Subcharacteristics</h3>"
-                + "<p>Each metric contributes to one or more quality subcharacteristics, which are used to evaluate the overall quality of an ontology. The subcharacteristics include:</p>"
-                + "<ul>"
-                + "<li><strong>Modularity:</strong> Measures the extent to which an ontology can be divided into smaller, independent modules.</li>"
-                + "<li><strong>Reusability:</strong> Reflects the extent to which ontology components can be reused in other contexts.</li>"
-                + "<li><strong>Analyzability:</strong> Indicates the ease with which an ontology can be analyzed and understood.</li>"
-                + "<li><strong>Testability:</strong> Reflects the ease with which an ontology can be tested and validated.</li>"
-                + "<li><strong>Modular Stability:</strong> Measures the extent to which an ontology's modules remain stable over time.</li>"
-                + "<h3>Interpreting Scores for Subcharacterisitics</h3>"
-                + "<p>Scores for each subcharacteristic can be interpreted as follows:</p>"
-                + "<ul>"
-                // Include an image showing best to worst score for each subcharacteristic
-                + "</ul>"
-                // Tell about overall score
-                //Include an image showing best to worst score for overall quality
-                + "</body></html>";
-        helpTextPane.setText(htmlContent);
-
-        JScrollPane scrollPane = new JScrollPane(helpTextPane);
-        helpDialog.add(scrollPane);
-
-        helpDialog.setSize(new Dimension(600, 400));
-        helpDialog.setLocationRelativeTo(null);
-        helpDialog.setVisible(true);
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(new URI("https://oepp-docs.vercel.app/"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void setupTable() {
@@ -224,6 +177,7 @@ public class Metrics extends JPanel {
             String displayName = "";
             if(metricCalculators.get(i) instanceof WMCOntoCalculator) {
                 displayName = "WMCOnto";
+
             } else if(metricCalculators.get(i) instanceof ANOntoCalculator) {
                 displayName = "ANOnto";
             }
@@ -263,6 +217,15 @@ public class Metrics extends JPanel {
             else if (metricCalculators.get(i) instanceof RFCOntoCalculator) {
                 displayName = "RFCOnto";
             }
+
+            else if (metricCalculators.get(i) instanceof TMOntoCalculator) {
+                displayName = "TMOnto";
+            }
+
+            else if (metricCalculators.get(i) instanceof RROntoCalculator) {
+                displayName = "RROnto";
+            }
+
             tableModel.addRow(new Object[]{displayName, metricValues.get(i)});
         }
     }
@@ -271,7 +234,8 @@ private class MetricCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        if (column == 1) { // Apply color coding only to the value column
+        if (column == 1)
+        {
             String metricName = (String) table.getValueAt(row, 0);
             Double metricValue = (Double) value;
             c.setBackground(getColorForMetric(metricName, metricValue));
@@ -286,83 +250,165 @@ private class MetricCellRenderer extends DefaultTableCellRenderer {
     private Color getColorForMetric(String metricName, Double value) {
         switch (metricName) {
             case "WMCOnto":
-                if (value < 0.2) return Color.RED;
-                else if (value > 0.2) return Color.YELLOW;
-                else if (value > 0.8) return Color.GREEN;
+                if (value > 8) return Color.RED;
+                else if (value >= 6 && value < 8) return Color.PINK;
+                else if (value >= 4 && value < 6) return Color.ORANGE;
+                else if (value >= 2 && value < 4) return Color.YELLOW;
+                else if (value < 2) return Color.GREEN;
                 break;
 
             case "ANOnto":
-                if (value >= 0.8) return Color.GREEN;
-                else if (value > 0.2) return Color.YELLOW;
+                if (value > 0.8) return Color.GREEN;
+                else if (value > 0.6 && value <= 0.8) return Color.YELLOW;
+                else if (value > 0.4 && value <= 0.6) return Color.ORANGE;
+                else if (value >= 0.2 && value <= 0.4) return Color.PINK;
                 else if (value < 0.2) return Color.RED;
                 break;
 
             case "AROnto":
                 if (value > 0.8) return Color.GREEN;
-                else if (value > 0.2) return Color.YELLOW;
+                else if (value > 0.6 && value <= 0.8) return Color.YELLOW;
+                else if (value > 0.4 && value <= 0.6) return Color.ORANGE;
+                else if (value >= 0.2 && value <= 0.4) return Color.PINK;
                 else if (value < 0.2) return Color.RED;
                 break;
 
             case "CBOnto":
                 if (value >= 1 && value <= 3) return Color.GREEN;
-                else if (value > 3) return Color.YELLOW;
-                else if (value <= 12) return Color.YELLOW;
+                else if (value > 3 && value <= 6) return Color.YELLOW;
+                else if (value > 6 && value <= 8) return Color.ORANGE;
+                else if (value > 8 && value <= 12) return Color.PINK;
                 else if (value > 12) return Color.RED;
-                break;
 
             case "CROnto":
                 if (value > 0.8) return Color.GREEN;
-                else if (value > 0.2) return Color.YELLOW;
+                else if (value > 0.6 && value <= 0.8) return Color.YELLOW;
+                else if (value > 0.4 && value <= 0.6) return Color.ORANGE;
+                else if (value >= 0.2 && value <= 0.4) return Color.PINK;
                 else if (value < 0.2) return Color.RED;
                 break;
 
             case "DITOnto":
                 if (value >= 1 && value <= 2) return Color.GREEN;
-                else if (value > 2 && value < 8) return Color.YELLOW;
-                else if (value >= 8) return Color.RED;
+                else if (value > 2 && value <= 4) return Color.YELLOW;
+                else if (value > 4 && value <= 6) return Color.ORANGE;
+                else if (value > 6 && value <= 8) return Color.PINK;
+                else if (value > 8) return Color.RED;
                 break;
 
             case "INROnto":
                 if (value > 0.8) return Color.GREEN;
-                else if (value > 0.2) return Color.YELLOW;
+                else if (value > 0.6 && value <= 0.8) return Color.YELLOW;
+                else if (value > 0.4 && value <= 0.6) return Color.ORANGE;
+                else if (value >= 0.2 && value <= 0.4) return Color.PINK;
                 else if (value < 0.2) return Color.RED;
                 break;
 
             case "NACOnto":
                 if (value >= 1 && value <= 2) return Color.GREEN;
-                else if (value > 2 && value < 8) return Color.YELLOW;
-                else if (value >= 8) return Color.RED;
+                else if (value > 2 && value <= 4) return Color.YELLOW;
+                else if (value > 4 && value <= 6) return Color.ORANGE;
+                else if (value > 6 && value <= 8) return Color.PINK;
+                else if (value > 8) return Color.RED;
                 break;
 
             case "NOCOnto":
                 if (value >= 1 && value <= 2) return Color.GREEN;
-                else if (value > 2 && value < 8) return Color.YELLOW;
-                else if (value >= 8) return Color.RED;
+                else if (value > 2 && value <= 4) return Color.YELLOW;
+                else if (value > 4 && value <= 6) return Color.ORANGE;
+                else if (value > 6 && value <= 8) return Color.PINK;
+                else if (value > 8) return Color.RED;
                 break;
 
             case "NOMOnto":
-                if (value >= 1 && value <= 2) return Color.GREEN;
-                else if (value > 2 && value < 8) return Color.YELLOW;
-                else if (value >= 8) return Color.RED;
+                if (value <= 2) return Color.GREEN;
+                else if (value > 2 && value <= 4) return Color.YELLOW;
+                else if (value > 4 && value <= 6) return Color.ORANGE;
+                else if (value > 6 && value <= 8) return Color.PINK;
+                else if (value > 8) return Color.RED;
                 break;
 
             case "POnto":
                 if (value > 0.8) return Color.GREEN;
-                else if (value > 0.2) return Color.YELLOW;
+                else if (value > 0.6 && value <= 0.8) return Color.YELLOW;
+                else if (value > 0.4 && value <= 0.6) return Color.ORANGE;
+                else if (value >= 0.2 && value <= 0.4) return Color.PINK;
                 else if (value < 0.2) return Color.RED;
                 break;
 
             case "PROnto":
                 if (value > 0.8) return Color.GREEN;
-                else if (value > 0.2) return Color.YELLOW;
+                else if (value > 0.6 && value <= 0.8) return Color.YELLOW;
+                else if (value > 0.4 && value <= 0.6) return Color.ORANGE;
+                else if (value >= 0.2 && value <= 0.4) return Color.PINK;
                 else if (value < 0.2) return Color.RED;
                 break;
 
             case "RFCOnto":
-                if (value >= 1 && value <= 2) return Color.GREEN;
-                else if (value > 2 && value < 8) return Color.YELLOW;
-                else if (value >= 8) return Color.RED;
+                if (value >= 1 && value <= 3) return Color.GREEN;
+                else if (value > 3 && value <= 6) return Color.YELLOW;
+                else if (value > 6 && value <= 8) return Color.ORANGE;
+                else if (value > 8 && value <= 12) return Color.PINK;
+                else if (value > 12) return Color.RED;
+
+            case "RROnto":
+                if (value > 0.8) return Color.GREEN;
+                else if (value > 0.6 && value <= 0.8) return Color.YELLOW;
+                else if (value > 0.4 && value <= 0.6) return Color.ORANGE;
+                else if (value >= 0.2 && value <= 0.4) return Color.PINK;
+                else if (value < 0.2) return Color.RED;
                 break;
+
+            case "TMOnto":
+                if (value >= 1 && value <= 2) return Color.GREEN;
+                else if (value > 2 && value <= 4) return Color.YELLOW;
+                else if (value > 4 && value <= 6) return Color.ORANGE;
+                else if (value > 6 && value <= 8) return Color.PINK;
+                else if (value > 8) return Color.RED;
+                break;
+
+            // case "ModularityScore":
+            //     if(value > 2 && value <= 5) return Color.GREEN;
+            //     else if(value > 5 && value <= 10) return Color.YELLOW;
+            //     else if(value > 10 && value <= 14) return Color.ORANGE;
+            //     else if(value > 14 && value <= 20) return Color.PINK;
+            //     else if(value > 20) return Color.RED;
+
+            // case "Reusability":
+            //     if(value <= 10)return Color.GREEN;
+            //     else if(value > 10 && value <= 20) return Color.YELLOW;
+            //     else if(value > 20 && value <= 28) return Color.ORANGE;
+            //     else if(value > 28 && value <= 40) return Color.PINK;
+            //     else if(value > 40) return Color.RED;
+
+            // case "Analysability":
+            //     if(value <= 14) return Color.GREEN;
+            //     else if(value > 14 && value <= 28) return Color.YELLOW;
+            //     else if(value > 28 && value <= 40) return Color.ORANGE;
+            //     else if(value > 40 && value <= 56) return Color.PINK;
+            //     else if(value > 56) return Color.RED;
+
+            // case "Modular Stability":
+            //     if(value <= 12) return Color.GREEN;
+            //     else if(value > 12 && value <= 24) return Color.YELLOW;
+            //     else if(value > 24 && value <= 34) return Color.ORANGE;
+            //     else if(value > 34 && value <= 48) return Color.PINK;
+            //     else if(value > 48) return Color.RED;
+
+            // case "Testability":
+            //     if(value <= 14) return Color.GREEN;
+            //     else if(value > 14 && value <= 28) return Color.YELLOW;
+            //     else if(value > 28 && value <= 34) return Color.ORANGE;
+            //     else if(value > 34 && value <= 56) return Color.PINK;
+            //     else if(value > 56) return Color.RED;
+
+            // case "Overall Score":
+            //     if(value <= 66) return Color.GREEN;
+            //     else if(value > 66 && value <= 142) return Color.YELLOW;
+            //     else if(value > 142 && value <= 196) return Color.ORANGE;
+            //     else if(value > 196 && value <= 284) return Color.PINK;
+            //     else if(value > 284) return Color.RED;
+
         }
         return Color.WHITE;
     }

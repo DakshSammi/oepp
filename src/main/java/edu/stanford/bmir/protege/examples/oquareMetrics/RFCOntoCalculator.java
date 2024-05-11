@@ -51,7 +51,7 @@ public class RFCOntoCalculator implements MetricCalculator {
     }
 
 
-        RFCOnto = (double) ((subClassofAxiomCount)/(classes.size() - rootClasses.size()))*(dataPropAssertionAxiomCount+ objectPropOnClasses);
+        RFCOnto = (double) ((subClassofAxiomCount)/(classes.size() - rootClasses.size()))*(dataPropAssertionAxiomCount + objectPropOnClasses);
 
         return RFCOnto;
     }

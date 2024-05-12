@@ -173,61 +173,115 @@ public class Metrics extends JPanel {
 
     private void updateTable(List<Double> metricValues) {
         tableModel.setRowCount(0);
+
+        Double CBOntoValue = 0.0;
+        Double WMCOntoValue = 0.0;
+        Double NOMOntoValue = 0.0;
+        Double RFCOntoValue = 0.0;
+        Double DITOntoValue = 0.0;
+        Double LCOMOntoValue = 0.0;
+        Double NOCOntoValue = 0.0;
+        // Double ANOntoValue = 0.0;
+        // Double AROntoValue = 0.0;
+        // Double INROntoValue = 0.0;
+        // Double RROntoValue = 0.0;
+        // Double POntoValue = 0.0;
+        // Double PROntoValue = 0.0;
+        // Double CROntoValue = 0.0;
+        // Double NACOntoValue = 0.0;
+        // Double TMOntoValue = 0.0;
+
         for (int i = 0; i < metricValues.size(); i++) {
             String displayName = "";
+            Double metricValue = metricValues.get(i);
+
             if(metricCalculators.get(i) instanceof WMCOntoCalculator) {
                 displayName = "WMCOnto";
+                WMCOntoValue = metricValue;
 
             } else if(metricCalculators.get(i) instanceof ANOntoCalculator) {
                 displayName = "ANOnto";
+                // ANOntoValue = metricValue;
             }
             else if(metricCalculators.get(i) instanceof AROntoCalculator) {
                 displayName = "AROnto";
+                // AROntoValue = metricValue;
             }
             else if(metricCalculators.get(i) instanceof CBOntoCalculator) {
                 displayName = "CBOnto";
+                CBOntoValue = metricValue;
             }
             else if(metricCalculators.get(i) instanceof CROntoCalculator) {
                 displayName = "CROnto";
+                // CROntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof DITOntoCalculator) {
                 displayName = "DITOnto";
+                DITOntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof INROntoCalculator) {
                 displayName = "INROnto";
+                // INROntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof LCOMOntoCalculator) {
                 displayName = "LCOMOnto";
+                LCOMOntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof NACOntoCalculator) {
                 displayName = "NACOnto";
+                // NACOntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof NOCOntoCalculator) {
                 displayName = "NOCOnto";
+                NOCOntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof NOMOntoCalculator) {
                 displayName = "NOMOnto";
+                NOMOntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof POntoCalculator) {
                 displayName = "POnto";
+                // POntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof PROntoCalculator) {
                 displayName = "PROnto";
+                // PROntoValue = metricValue;
             }
             else if (metricCalculators.get(i) instanceof RFCOntoCalculator) {
                 displayName = "RFCOnto";
+                RFCOntoValue = metricValue;
             }
 
             else if (metricCalculators.get(i) instanceof TMOntoCalculator) {
                 displayName = "TMOnto";
+                // TMOntoValue = metricValue;
             }
 
             else if (metricCalculators.get(i) instanceof RROntoCalculator) {
                 displayName = "RROnto";
+                // RROntoValue = metricValue;
             }
 
             tableModel.addRow(new Object[]{displayName, metricValues.get(i)});
         }
+
+        Double modularityScore = CBOntoValue + WMCOntoValue;
+        Double reusabilityScore = WMCOntoValue + RFCOntoValue + NOMOntoValue + CBOntoValue + DITOntoValue - NOCOntoValue;
+        Double analysabilityScore = WMCOntoValue + RFCOntoValue + NOMOntoValue + LCOMOntoValue + CBOntoValue + DITOntoValue;
+        Double changeabilityScore = WMCOntoValue + DITOntoValue + NOCOntoValue + RFCOntoValue + NOMOntoValue + CBOntoValue + LCOMOntoValue;
+        Double modificationStabilityScore = WMCOntoValue + NOCOntoValue + RFCOntoValue + CBOntoValue + LCOMOntoValue;
+        Double testabilityScore = WMCOntoValue + DITOntoValue + RFCOntoValue + NOMOntoValue + CBOntoValue + LCOMOntoValue;
+
+        Double overallScore = modularityScore + reusabilityScore + analysabilityScore + changeabilityScore + modificationStabilityScore + testabilityScore;
+
+        tableModel.addRow(new Object[]{"<html><b>MODULARITY</b></html>", modularityScore});
+        tableModel.addRow(new Object[]{"<html><b>REUSABILITY</b></html>", reusabilityScore});
+        tableModel.addRow(new Object[]{"<html><b>ANALYSABILITY</b></html>", analysabilityScore});
+        tableModel.addRow(new Object[]{"<html><b>CHANGEABILITY</b></html>", changeabilityScore});
+        tableModel.addRow(new Object[]{"<html><b>MODIFICATION STABILITY</b></html>", modificationStabilityScore});
+        tableModel.addRow(new Object[]{"<html><b>TESTABILITY</b></html>", testabilityScore});
+
+        tableModel.addRow(new Object[]{"<html><b>OVERALL SCORE</b></html>",overallScore});
     }
 
 private class MetricCellRenderer extends DefaultTableCellRenderer {
@@ -240,7 +294,9 @@ private class MetricCellRenderer extends DefaultTableCellRenderer {
             Double metricValue = (Double) value;
             c.setBackground(getColorForMetric(metricName, metricValue));
             c.setForeground(Color.BLACK);
-        } else {
+        }
+
+        else {
             c.setBackground(Color.WHITE);
             c.setForeground(Color.BLACK);
         }
@@ -305,7 +361,7 @@ private class MetricCellRenderer extends DefaultTableCellRenderer {
                 break;
 
             case "NACOnto":
-                if (value >= 1 && value <= 2) return Color.GREEN;
+                if (value <= 2) return Color.GREEN;
                 else if (value > 2 && value <= 4) return Color.YELLOW;
                 else if (value > 4 && value <= 6) return Color.ORANGE;
                 else if (value > 6 && value <= 8) return Color.PINK;
@@ -321,6 +377,14 @@ private class MetricCellRenderer extends DefaultTableCellRenderer {
                 break;
 
             case "NOMOnto":
+                if (value <= 2) return Color.GREEN;
+                else if (value > 2 && value <= 4) return Color.YELLOW;
+                else if (value > 4 && value <= 6) return Color.ORANGE;
+                else if (value > 6 && value <= 8) return Color.PINK;
+                else if (value > 8) return Color.RED;
+                break;
+
+            case "LCOMOnto":
                 if (value <= 2) return Color.GREEN;
                 else if (value > 2 && value <= 4) return Color.YELLOW;
                 else if (value > 4 && value <= 6) return Color.ORANGE;
@@ -360,54 +424,61 @@ private class MetricCellRenderer extends DefaultTableCellRenderer {
                 break;
 
             case "TMOnto":
-                if (value >= 1 && value <= 2) return Color.GREEN;
+                if (value <= 2) return Color.GREEN;
                 else if (value > 2 && value <= 4) return Color.YELLOW;
                 else if (value > 4 && value <= 6) return Color.ORANGE;
                 else if (value > 6 && value <= 8) return Color.PINK;
                 else if (value > 8) return Color.RED;
                 break;
 
-            // case "ModularityScore":
-            //     if(value > 2 && value <= 5) return Color.GREEN;
-            //     else if(value > 5 && value <= 10) return Color.YELLOW;
-            //     else if(value > 10 && value <= 14) return Color.ORANGE;
-            //     else if(value > 14 && value <= 20) return Color.PINK;
-            //     else if(value > 20) return Color.RED;
+            case "<html><b>MODULARITY</b></html>":
+                if(value > 2 && value <= 5) return Color.GREEN;
+                else if(value > 5 && value <= 10) return Color.YELLOW;
+                else if(value > 10 && value <= 14) return Color.ORANGE;
+                else if(value > 14 && value <= 20) return Color.PINK;
+                else if(value > 20) return Color.RED;
 
-            // case "Reusability":
-            //     if(value <= 10)return Color.GREEN;
-            //     else if(value > 10 && value <= 20) return Color.YELLOW;
-            //     else if(value > 20 && value <= 28) return Color.ORANGE;
-            //     else if(value > 28 && value <= 40) return Color.PINK;
-            //     else if(value > 40) return Color.RED;
+            case "<html><b>CHANGEABILITY</b></html>":
+                if(value <= 16) return Color.GREEN;
+                else if(value > 16 && value <= 32) return Color.YELLOW;
+                else if(value > 32 && value <= 46) return Color.ORANGE;
+                else if(value > 46 && value <= 64) return Color.PINK;
+                else if(value > 64) return Color.RED;
 
-            // case "Analysability":
-            //     if(value <= 14) return Color.GREEN;
-            //     else if(value > 14 && value <= 28) return Color.YELLOW;
-            //     else if(value > 28 && value <= 40) return Color.ORANGE;
-            //     else if(value > 40 && value <= 56) return Color.PINK;
-            //     else if(value > 56) return Color.RED;
+            case "<html><b>REUSABILITY</b></html>":
+                if(value <= 10)return Color.GREEN;
+                else if(value > 10 && value <= 20) return Color.YELLOW;
+                else if(value > 20 && value <= 28) return Color.ORANGE;
+                else if(value > 28 && value <= 40) return Color.PINK;
+                else if(value > 40) return Color.RED;
 
-            // case "Modular Stability":
-            //     if(value <= 12) return Color.GREEN;
-            //     else if(value > 12 && value <= 24) return Color.YELLOW;
-            //     else if(value > 24 && value <= 34) return Color.ORANGE;
-            //     else if(value > 34 && value <= 48) return Color.PINK;
-            //     else if(value > 48) return Color.RED;
+            case "<html><b>ANALYSABILITY</b></html>":
+                if(value <= 14) return Color.GREEN;
+                else if(value > 14 && value <= 28) return Color.YELLOW;
+                else if(value > 28 && value <= 40) return Color.ORANGE;
+                else if(value > 40 && value <= 56) return Color.PINK;
+                else if(value > 56) return Color.RED;
 
-            // case "Testability":
-            //     if(value <= 14) return Color.GREEN;
-            //     else if(value > 14 && value <= 28) return Color.YELLOW;
-            //     else if(value > 28 && value <= 34) return Color.ORANGE;
-            //     else if(value > 34 && value <= 56) return Color.PINK;
-            //     else if(value > 56) return Color.RED;
+            case "<html><b>MODIFICATION STABILITY</b></html>":
+                if(value <= 12) return Color.GREEN;
+                else if(value > 12 && value <= 24) return Color.YELLOW;
+                else if(value > 24 && value <= 34) return Color.ORANGE;
+                else if(value > 34 && value <= 48) return Color.PINK;
+                else if(value > 48) return Color.RED;
 
-            // case "Overall Score":
-            //     if(value <= 66) return Color.GREEN;
-            //     else if(value > 66 && value <= 142) return Color.YELLOW;
-            //     else if(value > 142 && value <= 196) return Color.ORANGE;
-            //     else if(value > 196 && value <= 284) return Color.PINK;
-            //     else if(value > 284) return Color.RED;
+            case "<html><b>TESTABILITY</b></html>":
+                if(value <= 14) return Color.GREEN;
+                else if(value > 14 && value <= 28) return Color.YELLOW;
+                else if(value > 28 && value <= 34) return Color.ORANGE;
+                else if(value > 34 && value <= 56) return Color.PINK;
+                else if(value > 56) return Color.RED;
+
+            case "<html><b>OVERALL SCORE</b></html>":
+                if(value <= 66) return Color.GREEN;
+                else if(value > 66 && value <= 142) return Color.YELLOW;
+                else if(value > 142 && value <= 196) return Color.ORANGE;
+                else if(value > 196 && value <= 284) return Color.PINK;
+                else if(value > 284) return Color.RED;
 
         }
         return Color.WHITE;
